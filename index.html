@@ -1,0 +1,2513 @@
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Almoxarifado</title>
+
+<style>
+  :root{
+    --bg:#f2f4f7;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --primary:#0d6efd;
+    --border:#e5e9f0;
+    --shadow: 0 8px 20px rgba(0,0,0,0.08);
+    --radius:14px;
+    --dark:#111827;
+    --danger:#dc2626;
+  }
+  *{box-sizing:border-box}
+  body{ margin:0; font-family: Arial, Helvetica, sans-serif; background:var(--bg); color:var(--text); }
+
+  header{
+    background:var(--dark);
+    color:#fff;
+    padding:14px 18px;
+    font-weight:900;
+    letter-spacing:.2px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .hdrLeft{display:flex; flex-direction:column; gap:4px;}
+  .devby{font-weight:700; font-size:12px; color:rgba(255,255,255,.85);}
+  .hdrRight{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .chip{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
+    color:#fff;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+  }
+
+  .menuBtn{
+    display:none;
+    width:42px; height:40px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+    border-radius:10px;
+  }
+
+  .wrap{ max-width:1200px; margin:0 auto; padding:18px; }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+
+  .tabBtn{
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fff;
+    cursor:pointer;
+    font-weight:800;
+    color:#111827;
+  }
+  .tabBtn.active{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:14px;
+  }
+  .gridTop{ display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; }
+  @media (max-width: 980px){ .gridTop{grid-template-columns:1fr} }
+
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .split{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  @media (max-width: 760px){ .split{grid-template-columns:1fr} }
+
+  input, select{
+    padding:10px 12px;
+    border:1px solid #cfd6de;
+    border-radius:10px;
+    outline:none;
+    min-height:40px;
+    background:#fff;
+  }
+  input:focus, select:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(13,110,253,.15); }
+
+  button{
+    padding:10px 12px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:var(--primary);
+    color:#fff;
+    font-weight:800;
+    min-height:40px;
+  }
+  button.secondary{ background:var(--dark); }
+  button.ghost{ background:#eef4ff; color:var(--primary); }
+  button.danger{ background:var(--danger); }
+  button:disabled{ opacity:.6; cursor:not-allowed; }
+
+  h3{ margin:0 0 10px; font-size:16px; }
+  .hint{ color:var(--muted); font-size:12px; margin-top:8px; }
+  hr{ border:none; border-top:1px solid var(--border); margin:12px 0; }
+
+  .kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .kpi{ background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px; }
+  .kpi .label{ color:var(--muted); font-size:12px; }
+  .kpi .value{ font-size:22px; font-weight:900; margin-top:6px; }
+
+  .productsGrid{ margin-top:14px; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+  .card{ background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+  .cardImg{ height:160px; background:#e9eef5; overflow:hidden; }
+  .cardImg img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .cardBody{ padding:12px; }
+  .title{ margin:0; font-size:16px; font-weight:900; }
+  .meta{ color:var(--muted); font-size:12px; margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; }
+  .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; background:#eef4ff; color:var(--primary); font-weight:800; }
+  .stock{
+    margin-top:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:12px;
+  }
+  .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .actions button{ flex:1; min-width:110px; }
+
+  .tableWrap{ max-height:360px; overflow:auto; border:1px solid var(--border); border-radius:12px; }
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  th, td{ border-bottom:1px solid var(--border); padding:10px 8px; text-align:left; vertical-align:top; }
+  th{ color:var(--muted); font-weight:800; position:sticky; top:0; background:#fff; }
+  .right{ text-align:right; }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+  .backdrop{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:2000;
+  }
+  .modal{
+    width:min(720px, 100%);
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .modalHeader{
+    padding:14px 16px;
+    background:var(--dark);
+    color:#fff;
+    font-weight:900;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .modalBody{ padding:16px; }
+  .modalFooter{
+    padding:14px 16px;
+    border-top:1px solid var(--border);
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+
+  .photoBox{
+    border:1px dashed #cfd6de;
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .photoPreview{
+    width:140px; height:100px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#e9eef5;
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .photoPreview img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .linkBtn{
+    background:#eef4ff;
+    color:var(--primary);
+    border:1px solid #d8e6ff;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:900;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .drawerBackdrop{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    z-index:2500;
+  }
+  .drawer{
+    position:absolute;
+    top:0; left:0;
+    width:min(340px, 88vw);
+    height:100%;
+    background:#fff;
+    border-right:1px solid var(--border);
+    box-shadow:var(--shadow);
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .drawerTop{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .drawerTitle{
+    font-weight:900;
+    color:var(--dark);
+    font-size:16px;
+  }
+  .drawerClose{
+    background:#eef2f7;
+    color:#111827;
+    border:1px solid var(--border);
+    border-radius:10px;
+    min-height:38px;
+  }
+  .drawerUser{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .drawerUser .chip{ color:#111827; background:#f3f4f6; border-color:#e5e7eb; }
+  .drawerNav{ display:flex; flex-direction:column; gap:8px; }
+  .drawerNav button{
+    background:#fff;
+    color:#111827;
+    border:1px solid var(--border);
+    text-align:left;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .drawerNav button.active{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+  }
+  .drawerFooter{
+    margin-top:auto;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+    color:#6b7280;
+    font-size:12px;
+    font-weight:800;
+  }
+
+  .loadingLine{
+    display:none;
+    font-size:12px;
+    font-weight:900;
+    color:var(--muted);
+  }
+
+  @media (max-width: 760px){
+    header{ align-items:flex-start; }
+    .hdrRight{ display:none; }
+    .menuBtn{ display:inline-flex; align-items:center; justify-content:center; }
+    .wrap{ padding:12px; }
+    .productsGrid{ grid-template-columns:1fr; }
+  }
+
+  /* ================== PRINT LABEL STYLES ================== */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #printContainer, #printContainer * {
+      visibility: visible;
+    }
+    #printContainer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    #printContainer > div {
+      width: 65mm;
+      height: 30mm;
+      page-break-after: always;
+    }
+    @page {
+      size: 65mm 30mm;
+      margin: 0;
+    }
+  }
+
+  /* ================== SCANNER STYLES ================== */
+  .scannerSection {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 10px;
+    background: #f9fafb;
+  }
+  .scannerSection h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: var(--dark);
+  }
+  .scannerVideo {
+    width: 100%;
+    max-width: 320px;
+    height: 240px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #000;
+    margin-top: 10px;
+  }
+  .scannerStatus {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+  .scannerStatus.success {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .scannerStatus.error {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .scannerStatus.waiting {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  @media (max-width: 760px){
+    .productsGrid.compact5{
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+    }
+    .productsGrid.compact5 .card{
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+    .productsGrid.compact5 .cardImg{ height: 70px !important; }
+    .productsGrid.compact5 .cardBody{ padding: 8px !important; }
+    .productsGrid.compact5 .title{
+      font-size: 12px !important;
+      line-height: 1.1;
+      margin: 0;
+    }
+    .productsGrid.compact5 .meta,
+    .productsGrid.compact5 .stock,
+    .productsGrid.compact5 .actions,
+    .productsGrid.compact5 .hint{ display: none !important; }
+    .productsGrid.compact5 .badge{
+      font-size: 10px !important;
+      padding: 2px 8px !important;
+    }
+  }
+</style>
+</head>
+
+<body>
+<header>
+  <div class="hdrLeft">
+    <div>Almoxarifado</div>
+    <div class="devby">Desenvolvido por Joaquim Magliano</div>
+  </div>
+
+  <div class="hdrRight" id="hdrRightDesktop">
+    <span class="chip" id="chipUser">—</span>
+
+    <button class="ghost" id="btnExportCSV" onclick="exportarCSVHistorico()">Exportar CSV</button>
+    <button class="ghost" id="btnBackupJSON" onclick="exportarJSON()">Backup JSON</button>
+    <button class="ghost" id="btnImportJSON" onclick="importarJSON()">Importar</button>
+
+    <button class="danger" onclick="sair()">Sair</button>
+  </div>
+
+  <button class="menuBtn" id="btnMenuMobile" onclick="toggleDrawer(true)" aria-label="Menu">☰</button>
+</header>
+
+<div class="drawerBackdrop" id="drawerBackdrop" onclick="toggleDrawer(false)">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="drawerTop">
+      <div class="drawerTitle">Menu</div>
+      <button class="drawerClose" onclick="toggleDrawer(false)">Fechar</button>
+    </div>
+
+    <div class="drawerUser">
+      <span class="chip" id="chipUserMobile">—</span>
+    </div>
+
+    <div class="drawerNav" id="drawerNavBase">
+      <button id="navPrincipal" onclick="abrirMobilePagina('principal')">Principal <span>›</span></button>
+      <button id="navItens" onclick="abrirMobilePagina('itens')">Itens <span>›</span></button>
+      <button id="navDashboard" onclick="abrirMobilePagina('dashboard')">Dashboard <span>›</span></button>
+    </div>
+
+    <hr id="drawerAdminSep" style="display:none; margin:8px 0;">
+
+    <div class="drawerNav" id="drawerAdminNav" style="display:none;">
+      <button id="navRelatorios" onclick="abrirMobilePagina('relatorios')">Relatórios <span>›</span></button>
+      <button id="navUsuarios" onclick="abrirMobilePagina('usuarios')">Usuários <span>›</span></button>
+      <button class="ghost" id="btnExportCSVMobile" onclick="exportarCSVHistorico()">Exportar CSV <span>›</span></button>
+      <button class="ghost" id="btnBackupJSONMobile" onclick="exportarJSON()">Backup JSON <span>›</span></button>
+      <button class="ghost" id="btnImportJSONMobile" onclick="importarJSON()">Importar <span>›</span></button>
+    </div>
+
+    <div class="drawerNav">
+      <button class="danger" onclick="sair()">Sair <span>›</span></button>
+    </div>
+
+    <div class="drawerFooter">
+      Desenvolvido por <b>Joaquim Magliano</b>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs" id="tabsDesktop">
+    <button class="tabBtn active" id="tabBtnEstoque" onclick="setTab('estoque')">Estoque</button>
+    <button class="tabBtn" id="tabBtnRelatorios" onclick="setTab('relatorios')">Relatórios</button>
+    <button class="tabBtn" id="tabBtnUsuarios" onclick="setTab('usuarios')">Usuários</button>
+  </div>
+
+  <div id="tabEstoque">
+    <div class="gridTop">
+      <div class="panel">
+
+        <div id="cadastroArea">
+          <h3>Cadastro de Produto</h3>
+
+          <div class="split">
+            <div><input id="nome" placeholder="Nome do produto" style="width:100%"></div>
+            <div><input id="unidade" placeholder="Unidade (ex: un, kg, m, L, 10L)" style="width:100%"></div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <input id="qtdCadastro" placeholder="Quantidade (vira o estoque) - ex: 10 / 10,5" style="width:100%">
+          </div>
+
+          <div class="split" style="margin-top:10px;">
+            <div>
+              <input id="categoria" placeholder="Categoria" list="categoriasList" style="width:100%">
+              <datalist id="categoriasList"></datalist>
+            </div>
+            <div><input id="localizacao" placeholder="Localização (ex: Prateleira 1)" style="width:100%"></div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <input type="file" id="imagemFile" accept="image/*" capture="environment" style="width:100%">
+          </div>
+
+          <div class="loadingLine" id="loadingCadastro">Processando foto...</div>
+
+          <div class="row" style="margin-top:10px;">
+            <button id="btnCadastrar" onclick="cadastrarProduto()">Cadastrar</button>
+            <button class="secondary" onclick="limparCampos()">Limpar</button>
+            <span class="hint">No celular, o campo de imagem abre a câmera.</span>
+          </div>
+
+          <div class="hint">
+            Dica: Se a unidade for <b>10L</b>, o sistema permite retirar <b>5L</b>, <b>2,5L</b>, etc. (controle por litros).
+          </div>
+        </div>
+
+        <div id="pesquisaArea">
+          <hr>
+
+          <h3>Pesquisar / Filtrar</h3>
+          <div class="row">
+            <input id="busca" placeholder="Buscar por nome, categoria ou ID..." style="flex:1; min-width:260px;">
+            <input id="filtroCategoria" placeholder="Filtrar por categoria" list="categoriasList" style="min-width:220px;">
+            <button class="ghost" onclick="limparFiltros()">Limpar</button>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <input id="filtroLocal" placeholder="Filtrar por prateleira/local (ex: Prateleira 1)" style="flex:1; min-width:260px;">
+            <button class="ghost" onclick="limparFiltroLocal()">Limpar local</button>
+          </div>
+
+          <div class="scannerSection">
+            <h4>📷 Scanner de Código de Barras</h4>
+            <div class="row">
+              <input id="scannerInput" placeholder="Digite o código de barras ou ID e pressione Enter" style="flex:1; min-width:260px;">
+              <button class="ghost" onclick="limparScanner()">Limpar</button>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <button id="btnStartCamera" onclick="iniciarCameraScan()">📷 Iniciar câmera</button>
+              <button id="btnStopCamera" onclick="pararCameraScan()" style="display:none; background:var(--danger);">⏹ Parar câmera</button>
+            </div>
+            <video id="scannerVideo" class="scannerVideo" style="display:none;"></video>
+            <div id="scannerStatus" class="scannerStatus" style="display:none;"></div>
+          </div>
+
+          <div class="hint" id="contador"></div>
+
+          <hr>
+
+          <h3>Ver o que tem em uma prateleira</h3>
+          <div class="row">
+            <input id="pratBusca" placeholder="Digite a prateleira/localização (ex: Prateleira 1)" style="flex:1; min-width:260px;">
+            <button onclick="renderPrateleira()">Ver</button>
+          </div>
+
+          <div class="tableWrap" style="margin-top:10px; max-height:260px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Local</th>
+                  <th>Produto</th>
+                  <th class="right">Qtd</th>
+                  <th>Un</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaPrateleira"></tbody>
+            </table>
+          </div>
+          <div class="hint" id="pratContador"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="dashboardPanel">
+        <h3>Dashboard</h3>
+        <div class="kpis">
+          <div class="kpi"><div class="label">Produtos</div><div class="value" id="kpiProdutos">0</div></div>
+          <div class="kpi"><div class="label">Categorias</div><div class="value" id="kpiCategorias">0</div></div>
+          <div class="kpi"><div class="label">Itens em estoque</div><div class="value" id="kpiItens">0</div></div>
+        </div>
+
+        <hr>
+
+        <h3>Categorias</h3>
+        <div class="row">
+          <input id="novaCategoria" placeholder="Nova categoria" style="flex:1; min-width:220px;">
+          <button onclick="criarCategoria()">Adicionar</button>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <input id="pesquisaCat" placeholder="Pesquisar categoria..." style="flex:1; min-width:220px;">
+        </div>
+
+        <div class="tableWrap" style="margin-top:10px; max-height:220px;">
+          <table>
+            <thead><tr><th>Categoria</th><th class="right">Produtos</th></tr></thead>
+            <tbody id="tabelaCategorias"></tbody>
+          </table>
+        </div>
+
+        <hr>
+
+        <h3>Excluir categoria</h3>
+        <div class="row">
+          <select id="categoriaExcluir" style="flex:1; min-width:220px;"></select>
+          <button class="danger" onclick="excluirCategoria()">Excluir</button>
+        </div>
+        <div class="hint">Ao excluir, os produtos dessa categoria vão para <b>SEM CATEGORIA</b> e isso fica no histórico.</div>
+      </div>
+    </div>
+
+    <div class="productsGrid" id="lista"></div>
+  </div>
+
+  <div id="tabRelatorios" style="display:none;">
+    <div class="panel">
+      <h3>Histórico de Movimentações e Auditoria</h3>
+      <div class="row">
+        <input id="relBusca" placeholder="Buscar (produto, usuário, ação, categoria, quem pegou...)" style="flex:1; min-width:260px;">
+        <select id="relAcao" style="min-width:220px;">
+          <option value="">Todas as ações</option>
+          <option value="ENTRADA">ENTRADA</option>
+          <option value="SAÍDA">SAÍDA</option>
+          <option value="CADASTRO_PRODUTO">CADASTRO_PRODUTO</option>
+          <option value="EDITOU_PRODUTO">EDITOU_PRODUTO</option>
+          <option value="EXCLUIU_PRODUTO">EXCLUIU_PRODUTO</option>
+          <option value="CRIOU_CATEGORIA">CRIOU_CATEGORIA</option>
+          <option value="EXCLUIU_CATEGORIA">EXCLUIU_CATEGORIA</option>
+          <option value="CRIOU_USUARIO">CRIOU_USUARIO</option>
+          <option value="REMOVEU_USUARIO">REMOVEU_USUARIO</option>
+          <option value="TROCOU_SENHA">TROCOU_SENHA</option>
+        </select>
+        <button class="ghost" onclick="limparFiltrosRel()">Limpar</button>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button onclick="exportarCSVHistorico()">Exportar CSV (Excel)</button>
+        <button class="danger" onclick="limparHistorico()">Limpar histórico</button>
+        <span class="hint">Saída exige <b>foto obrigatória</b>.</span>
+      </div>
+
+      <div class="tableWrap" style="margin-top:12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Usuário</th>
+              <th>Ação</th>
+              <th>Produto</th>
+              <th class="right">Qtd</th>
+              <th class="right">Antes</th>
+              <th class="right">Depois</th>
+              <th>Quem pegou</th>
+              <th>Detalhes</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaHistorico"></tbody>
+        </table>
+      </div>
+
+      <div class="hint" id="relContador"></div>
+    </div>
+  </div>
+
+  <div id="tabUsuarios" style="display:none;">
+    <div class="panel">
+      <h3>Usuários (Admin / Operador)</h3>
+      <div class="hint">Somente <b>ADMIN</b> acessa esta aba. O ADMIN pode criar <b>novos ADMINs</b> e <b>OPERADORES</b>. (Não remove o último ADMIN)</div>
+
+      <hr>
+
+      <div id="usuariosAdminArea">
+        <h3>Criar usuário</h3>
+        <div class="row">
+          <input id="novoUserNome" placeholder="Usuário (ex: joao)" style="min-width:220px;">
+          <input id="novoUserSenha" type="password" placeholder="Senha" style="min-width:220px;">
+          <select id="novoUserRole" style="min-width:180px;">
+            <option value="OPERADOR">OPERADOR</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+          <button onclick="criarUsuario()">Criar</button>
+        </div>
+
+        <hr>
+      </div>
+
+      <h3>Lista de usuários</h3>
+      <div class="tableWrap">
+        <table>
+          <thead><tr><th>Usuário</th><th>Tipo</th><th class="right">Ações</th></tr></thead>
+          <tbody id="tabelaUsuarios"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- LOGIN -->
+<div class="backdrop" id="loginBackdrop">
+  <div class="modal">
+    <div class="modalHeader">
+      <div id="loginTitle">Entrar</div>
+      <button class="ghost" disabled>—</button>
+    </div>
+    <div class="modalBody">
+      <div class="hint" id="loginDesc">Digite usuário e senha.</div>
+      <div class="row" style="margin-top:10px;">
+        <input id="loginUser" placeholder="Usuário" style="flex:1; min-width:220px;">
+        <input id="loginPass" type="password" placeholder="Senha" style="flex:1; min-width:220px;">
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <button onclick="entrar()">Entrar</button>
+      </div>
+
+      <div id="primeiroAcesso" style="display:none; margin-top:14px;">
+        <hr>
+        <h3 style="margin:0 0 8px;">Primeiro acesso (criar o primeiro ADMIN)</h3>
+        <div class="hint">Crie o primeiro usuário ADMIN do sistema.</div>
+        <div class="row" style="margin-top:10px;">
+          <input id="firstUser" placeholder="Usuário admin (ex: admin)" style="flex:1; min-width:220px;">
+          <input id="firstPass" type="password" placeholder="Senha admin" style="flex:1; min-width:220px;">
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <button class="secondary" onclick="criarPrimeiroAdmin()">Criar ADMIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT -->
+<div class="backdrop" id="editBackdrop">
+  <div class="modal">
+    <div class="modalHeader">
+      <div>Editar Produto</div>
+      <button class="ghost" onclick="fecharEdit()">Fechar</button>
+    </div>
+    <div class="modalBody">
+      <input type="hidden" id="editId">
+      <div class="split">
+        <div><input id="editNome" placeholder="Nome" style="width:100%"></div>
+        <div><input id="editUnidade" placeholder="Unidade (ex: un, kg, L, 10L)" style="width:100%"></div>
+      </div>
+      <div class="split" style="margin-top:10px;">
+        <div><input id="editCategoria" placeholder="Categoria" list="categoriasList" style="width:100%"></div>
+        <div><input id="editLocalizacao" placeholder="Localização" style="width:100%"></div>
+      </div>
+      <div class="split" style="margin-top:10px;">
+        <div>
+          <input type="file" id="editImagemFile" accept="image/*" capture="environment" style="width:100%">
+          <div class="loadingLine" id="loadingEdit">Processando foto...</div>
+          <div class="hint">Se não escolher imagem, mantém a atual.</div>
+        </div>
+        <div>
+          <div class="hint">ID:</div>
+          <div class="mono" style="font-weight:900; font-size:18px;" id="editIdLabel">—</div>
+          <div class="hint">Fica registrado quem editou e o que mudou.</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <input id="editMotivo" placeholder="Motivo/observação da edição (opcional)" style="width:100%">
+      </div>
+    </div>
+    <div class="modalFooter">
+      <button class="secondary" onclick="salvarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOTO SAÍDA -->
+<div class="backdrop" id="fotoBackdrop">
+  <div class="modal">
+    <div class="modalHeader">
+      <div>Foto obrigatória (Saída)</div>
+      <button class="ghost" onclick="cancelarFoto()">Cancelar</button>
+    </div>
+    <div class="modalBody">
+      <div class="hint">
+        Tire uma foto para registrar que foi a pessoa mesmo que pegou.
+        <b>Sem foto, a saída não é concluída.</b>
+      </div>
+
+      <div class="photoBox" style="margin-top:12px;">
+        <div class="photoPreview" id="fotoPreview">
+          <span class="hint" style="margin:0">Sem foto</span>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <input type="file" id="saidaFotoFile" accept="image/*" capture="user" style="width:100%">
+          <div class="loadingLine" id="loadingSaida">Processando foto...</div>
+          <div class="hint" style="margin-top:6px;">No celular, abre a câmera (selfie). No PC, selecione uma imagem.</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <input id="saidaObs" placeholder="Observação (opcional)" style="flex:1; min-width:260px;">
+      </div>
+    </div>
+    <div class="modalFooter">
+      <button class="ghost" onclick="limparFoto()">Trocar/limpar foto</button>
+      <button class="secondary" id="btnConfirmarFoto" onclick="confirmarSaidaComFoto()" disabled>Confirmar saída</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW FOTO -->
+<div class="backdrop" id="viewFotoBackdrop">
+  <div class="modal">
+    <div class="modalHeader">
+      <div>Foto da saída</div>
+      <button class="ghost" onclick="fecharViewFoto()">Fechar</button>
+    </div>
+    <div class="modalBody">
+      <div class="photoPreview" style="width:100%; height:420px;" id="viewFotoBox"></div>
+      <div class="hint" id="viewFotoMeta" style="margin-top:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT CONTAINER -->
+<div id="printContainer" style="display:none;"></div>
+
+<!-- ITEM -->
+<div class="backdrop" id="itemBackdrop">
+  <div class="modal">
+    <div class="modalHeader">
+      <div id="itemModalTitle">Item</div>
+      <button class="ghost" onclick="fecharItemModal()">Fechar</button>
+    </div>
+    <div class="modalBody" id="itemModalBody"></div>
+    <div class="modalFooter" id="itemModalFooter"></div>
+  </div>
+</div>
+
+<script>
+/* ================== BARCODE GENERATOR ================== */
+function generateCode39Barcode(text) {
+  const CODE39_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.$/+%';
+  const CODE39_PATTERNS = {
+    '0': '101001101101', '1': '110100101011', '2': '101100101011', '3': '110110010101',
+    '4': '101001101011', '5': '110100110101', '6': '101100110101', '7': '101001011011',
+    '8': '110100101101', '9': '101100101101', 'A': '110101001011', 'B': '101101001011',
+    'C': '110110100101', 'D': '101011001011', 'E': '110101100101', 'F': '101101100101',
+    'G': '101010011011', 'H': '110101001101', 'I': '101101001101', 'J': '101011001101',
+    'K': '110101010011', 'L': '101101010011', 'M': '110110101001', 'N': '101011010011',
+    'O': '110101101001', 'P': '101101101001', 'Q': '101010110011', 'R': '110101011001',
+    'S': '101101011001', 'T': '101011011001', 'U': '110010101011', 'V': '100110101011',
+    'W': '110011010101', 'X': '100101101011', 'Y': '110010110101', 'Z': '100110110101',
+    '-': '100101011011', '.': '110010101101', ' ': '100110101101', '$': '100100100101',
+    '/': '100100101001', '+': '100101001001', '%': '101001001001', '*': '100101101101'
+  };
+
+  const cleanText = text.toUpperCase().replace(/[^0-9A-Z\-\.\$\/\+\% ]/g, '');
+  const encodedText = '*' + cleanText + '*';
+  
+  let barcode = '';
+  for (let i = 0; i < encodedText.length; i++) {
+    const char = encodedText[i];
+    if (CODE39_PATTERNS[char]) {
+      barcode += CODE39_PATTERNS[char] + '0';
+    }
+  }
+  
+  const barWidth = 2;
+  const barHeight = 60;
+  const quietZone = 10;
+  
+  const svgWidth = barcode.length * barWidth + quietZone * 2;
+  const svgHeight = barHeight + 20;
+  
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">`;
+  svg += `<rect width="${svgWidth}" height="${svgHeight}" fill="white"/>`;
+  
+  let x = quietZone;
+  for (let i = 0; i < barcode.length; i++) {
+    if (barcode[i] === '1') {
+      svg += `<rect x="${x}" y="10" width="${barWidth}" height="${barHeight}" fill="black"/>`;
+    }
+    x += barWidth;
+  }
+  
+  svg += `<text x="${svgWidth/2}" y="${svgHeight - 2}" text-anchor="middle" font-family="monospace" font-size="12" fill="black">${cleanText}</text>`;
+  svg += '</svg>';
+  
+  return svg;
+}
+
+/* ================== LABEL PRINTING ================== */
+function printProductLabel(productId) {
+  const product = state.produtos.find(p => p.id === productId);
+  if (!product) return;
+  
+  const barcodeSvg = generateCode39Barcode(product.barcode || product.id);
+  
+  // Create print container with proper styling
+  const printContainer = document.getElementById('printContainer');
+  printContainer.innerHTML = `
+    <div style="width: 65mm; height: 30mm; padding: 2mm; font-family: Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="font-weight: bold; font-size: 8px; margin-bottom: 1mm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(product.nome)}</div>
+      <div style="font-size: 6px; color: #666; margin-bottom: 1mm;">${escapeHtml(product.categoria || '')}</div>
+      <div style="font-size: 6px; margin-bottom: 1mm;">ID: ${escapeHtml(product.id)}</div>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center; min-height: 12mm;">
+        ${barcodeSvg}
+      </div>
+      <div style="font-size: 6px; text-align: center; font-family: monospace; color: #333; margin-top: 1mm;">${escapeHtml(product.barcode)}</div>
+    </div>
+  `;
+  
+  // Small delay to ensure content is rendered before print dialog
+  setTimeout(() => {
+    window.print();
+    // Clear container after printing
+    setTimeout(() => {
+      printContainer.innerHTML = '';
+    }, 100);
+  }, 200);
+}
+
+/* ================== BARCODE SCANNER ================== */
+let scannerStream = null;
+let barcodeDetector = null;
+
+function initBarcodeDetector() {
+  if ('BarcodeDetector' in window) {
+    try {
+      barcodeDetector = new BarcodeDetector({ formats: ['code_128', 'code_39', 'ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+    } catch (e) {
+      console.log('BarcodeDetector not supported for these formats');
+    }
+  }
+}
+
+async function iniciarCameraScan() {
+  try {
+    const video = document.getElementById('scannerVideo');
+    const btnStart = document.getElementById('btnStartCamera');
+    const btnStop = document.getElementById('btnStopCamera');
+    
+    // Request camera permission first
+    scannerStream = await navigator.mediaDevices.getUserMedia({ 
+      video: { facingMode: 'environment' } 
+    });
+    
+    video.srcObject = scannerStream;
+    video.style.display = 'block';
+    video.play();
+    
+    btnStart.style.display = 'none';
+    btnStop.style.display = 'inline-block';
+    
+    if (!barcodeDetector) {
+      showScannerStatus('BarcodeDetector não suportado neste dispositivo. Câmera ativa para visualização manual.', 'error');
+      return;
+    }
+    
+    showScannerStatus('Procurando códigos...', 'waiting');
+    scanContinuously();
+  } catch (error) {
+    showScannerStatus('Erro ao acessar câmera: ' + error.message, 'error');
+  }
+}
+
+async function scanContinuously() {
+  const video = document.getElementById('scannerVideo');
+  if (!video.srcObject) return;
+  
+  // Only scan if BarcodeDetector is supported
+  if (!barcodeDetector) {
+    // Just keep camera active for manual viewing
+    if (scannerStream) {
+      setTimeout(() => scanContinuously(), 100);
+    }
+    return;
+  }
+  
+  try {
+    const barcodes = await barcodeDetector.detect(video);
+    if (barcodes.length > 0) {
+      const barcode = barcodes[0].rawValue;
+      showScannerStatus(`Código encontrado: ${barcode}`, 'success');
+      
+      setTimeout(() => {
+        pararCameraScan();
+        buscarPorCodigoDeBarras(barcode);
+      }, 500);
+      return;
+    }
+  } catch (error) {
+    console.log('Scan error:', error);
+  }
+  
+  if (scannerStream) {
+    requestAnimationFrame(scanContinuously);
+  }
+}
+
+function pararCameraScan() {
+  if (scannerStream) {
+    scannerStream.getTracks().forEach(track => {
+      try {
+        track.stop();
+      } catch (e) {
+        console.log('Error stopping track:', e);
+      }
+    });
+    scannerStream = null;
+  }
+  
+  const video = document.getElementById('scannerVideo');
+  const btnStart = document.getElementById('btnStartCamera');
+  const btnStop = document.getElementById('btnStopCamera');
+  
+  if (video) {
+    video.style.display = 'none';
+    video.srcObject = null;
+  }
+  
+  if (btnStart) btnStart.style.display = 'inline-block';
+  if (btnStop) btnStop.style.display = 'none';
+  
+  hideScannerStatus();
+}
+
+function showScannerStatus(message, type) {
+  const status = document.getElementById('scannerStatus');
+  status.textContent = message;
+  status.className = `scannerStatus ${type}`;
+  status.style.display = 'block';
+}
+
+function hideScannerStatus() {
+  const status = document.getElementById('scannerStatus');
+  status.style.display = 'none';
+}
+
+function buscarPorCodigoDeBarras(codigo) {
+  const product = state.produtos.find(p => 
+    (p.barcode && p.barcode === codigo) || p.id === codigo
+  );
+  
+  if (product) {
+    showScannerStatus(`Produto encontrado: ${product.nome}`, 'success');
+    
+    if (isMobile()) {
+      abrirMobilePagina('itens');
+      setTimeout(() => abrirItemModal(product.id), 300);
+    } else {
+      document.getElementById('busca').value = codigo;
+      renderProdutos();
+      
+      setTimeout(() => {
+        const card = document.querySelector(`[onclick*="${product.id}"]`);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.animation = 'pulse 2s';
+          setTimeout(() => card.style.animation = '', 2000);
+        }
+      }, 100);
+    }
+  } else {
+    showScannerStatus(`Produto não encontrado: ${codigo}`, 'error');
+  }
+}
+
+function limparScanner() {
+  document.getElementById('scannerInput').value = '';
+  hideScannerStatus();
+}
+
+/* ================== STORAGE ================== */
+const STORAGE_KEY = "ALMOX_ERP_V8_QTD_CADASTRO_MOBILE_MENU";
+let state = {
+  lastId: 0,
+  produtos: [],
+  categorias: [],
+  historico: [],
+  users: [],
+  session: null,
+  mobileView: "principal"
+};
+
+function salvar(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function carregar(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{
+      const obj = JSON.parse(raw);
+      state = Object.assign(state, obj || {});
+      state.produtos = state.produtos || [];
+      state.categorias = state.categorias || [];
+      state.historico = state.historico || [];
+      state.users = state.users || [];
+      state.session = state.session || null;
+      state.lastId = state.lastId || 0;
+      state.mobileView = state.mobileView || "principal";
+      
+      // Migrate old products to have barcodes
+      state.produtos.forEach(p => {
+        if (!p.barcode) {
+          p.barcode = p.id;
+        }
+      });
+      salvar();
+    }catch(e){}
+  }
+}
+
+/* ================== UTILS ================== */
+function nowISO(){
+  const d = new Date();
+  const pad = (n)=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function pad6(n){ return String(n).padStart(6,"0"); }
+function gerarID(){ state.lastId += 1; return "P" + pad6(state.lastId); }
+function norm(t){ return (t||"").trim(); }
+function normLower(t){ return norm(t).toLowerCase(); }
+function toNumber(txt){
+  const v = String(txt||"").replace(",",".").trim();
+  if(!v) return 0;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+}
+function placeholderImg(){
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
+    <rect width="100%" height="100%" fill="#e9eef5"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+      font-family="Arial" font-size="36" fill="#6b7280">Sem imagem</text>
+  </svg>`);
+}
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function formatNumber(n){
+  const v = Number(n);
+  if(!Number.isFinite(v)) return "0";
+  if(Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v));
+  return v.toFixed(2).replace(".", ",");
+}
+function isAdmin(){ return state.session && state.session.role === "ADMIN"; }
+function currentUser(){ return state.session ? state.session.username : "—"; }
+function currentRole(){ return state.session ? state.session.role : "—"; }
+function garantirSemCategoria(){
+  if(!state.categorias.includes("SEM CATEGORIA")) state.categorias.push("SEM CATEGORIA");
+}
+function setLoading(id, on){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.display = on ? "block" : "none";
+}
+
+/* ================== MOBILE CHECK ================== */
+function isMobile(){
+  return window.matchMedia && window.matchMedia("(max-width: 760px)").matches;
+}
+
+/* ================== DRAWER (somente mobile) ================== */
+function toggleDrawer(open){
+  const d = document.getElementById("drawerBackdrop");
+  if(!d) return;
+  d.style.display = open ? "block" : "none";
+}
+function setMobileTitle(view){
+  const map = {
+    principal: "Principal",
+    itens: "Itens",
+    dashboard: "Dashboard",
+    relatorios: "Relatórios",
+    usuarios: "Usuários"
+  };
+  const label = map[view] || "Principal";
+  const btn = document.getElementById("tabBtnEstoque");
+  if(btn && isMobile()) btn.textContent = label;
+}
+function highlightDrawer(view){
+  const ids = ["principal","itens","dashboard","relatorios","usuarios"];
+  ids.forEach(k=>{
+    const el = document.getElementById("nav"+k.charAt(0).toUpperCase()+k.slice(1));
+    if(el) el.classList.toggle("active", state.mobileView === k);
+  });
+}
+function abrirMobilePagina(view){
+  if(!isMobile()) return;
+  if((view === "relatorios" || view === "usuarios") && !isAdmin()){
+    alert("Somente ADMIN pode acessar.");
+    return;
+  }
+  state.mobileView = view;
+  salvar();
+  aplicarLayoutMobile();
+  highlightDrawer(view);
+  toggleDrawer(false);
+  setTimeout(()=>window.scrollTo({top:0, behavior:"smooth"}), 50);
+}
+
+/* ================== IMAGEM (ANTI TRAVAMENTO NO CELULAR) ================== */
+async function fileToCompressedDataURL(file, opts = {}){
+  const { maxW = 1280, maxH = 1280, quality = 0.72, mime = "image/jpeg" } = opts;
+
+  const dataURL = await new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+
+  const img = await new Promise((resolve, reject)=>{
+    const i = new Image();
+    i.onload = ()=>resolve(i);
+    i.onerror = reject;
+    i.src = dataURL;
+  });
+
+  let w = img.width, h = img.height;
+  const ratio = Math.min(maxW / w, maxH / h, 1);
+  const nw = Math.round(w * ratio);
+  const nh = Math.round(h * ratio);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = nw;
+  canvas.height = nh;
+
+  const ctx = canvas.getContext("2d", { alpha:false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, nw, nh);
+
+  const out = canvas.toDataURL(mime, quality);
+  canvas.width = 1; canvas.height = 1;
+  return out;
+}
+
+/* ================== UNIDADES / LITROS ================== */
+function parseUnidade(unidadeRaw){
+  const u = (unidadeRaw || "").trim();
+  const ul = u.toLowerCase().replace(/\s+/g,"");
+
+  if(ul === "l" || ul === "litro" || ul === "litros"){
+    return { base:"L", fator:1, display:"L", raw:u };
+  }
+
+  const m = ul.match(/^(\d+(?:[.,]\d+)?)\s*(l|litro|litros)$/i);
+  if(m){
+    const fator = Number(String(m[1]).replace(",",".")); // 10L => fator 10
+    if(Number.isFinite(fator) && fator > 0){
+      return { base:"L", fator:fator, display:"L", raw:u };
+    }
+  }
+
+  return { base:null, fator:1, display:u || "un", raw:u || "un" };
+}
+
+function validarQuantidadePorUnidade(qtdBase, unidadeRaw){
+  if(!Number.isFinite(qtdBase) || qtdBase <= 0) return {ok:false, msg:"Quantidade inválida."};
+  const info = parseUnidade(unidadeRaw);
+  if(info.base === "L") return {ok:true, msg:""};
+  if(Math.abs(qtdBase - Math.round(qtdBase)) > 1e-9){
+    return {ok:false, msg:"Para essa unidade, só pode número inteiro (ex: 1, 2, 3)."};
+  }
+  return {ok:true, msg:""};
+}
+function unidadeParaExibirProduto(p){
+  const info = parseUnidade(p.unidade);
+  if(info.base === "L") return "L";
+  return p.unidade || "un";
+}
+function promptLabelUnidade(p){
+  const info = parseUnidade(p.unidade);
+  if(info.base === "L") return "L";
+  return p.unidade || "un";
+}
+
+/* ================== HISTÓRICO ================== */
+function logEvento(evt){
+  state.historico.unshift({
+    data: nowISO(),
+    usuario: currentUser(),
+    role: currentRole(),
+    acao: evt.acao || "AÇÃO",
+    produtoId: evt.produtoId || "",
+    produtoNome: evt.produtoNome || "",
+    categoria: evt.categoria || "",
+    qtd: (evt.qtd ?? ""),
+    antes: (evt.antes ?? ""),
+    depois: (evt.depois ?? ""),
+    quemPegou: evt.quemPegou || "",
+    detalhes: evt.detalhes || "",
+    fotoBase64: evt.fotoBase64 || ""
+  });
+  salvar();
+}
+
+/* ================== LOGIN ================== */
+function mostrarLogin(){
+  document.getElementById("loginBackdrop").style.display = "flex";
+  const temUsers = (state.users || []).length > 0;
+  document.getElementById("primeiroAcesso").style.display = temUsers ? "none" : "block";
+  document.getElementById("loginDesc").textContent = temUsers
+    ? "Digite usuário e senha."
+    : "Nenhum usuário encontrado. Crie o primeiro ADMIN.";
+}
+function esconderLogin(){ document.getElementById("loginBackdrop").style.display = "none"; }
+
+function criarPrimeiroAdmin(){
+  const u = norm(document.getElementById("firstUser").value);
+  const p = norm(document.getElementById("firstPass").value);
+  if(u.length < 2) return alert("Usuário muito curto.");
+  if(p.length < 4) return alert("Senha deve ter pelo menos 4 caracteres.");
+
+  if((state.users || []).length > 0){
+    alert("Já existem usuários. Faça login.");
+    return;
+  }
+
+  state.users.push({username:u, password:p, role:"ADMIN"});
+  state.session = {username:u, role:"ADMIN"};
+  salvar();
+  logEvento({acao:"CRIOU_USUARIO", detalhes:`Criou usuário ${u} (ADMIN)`});
+  atualizarUIPosLogin();
+  esconderLogin();
+}
+
+function entrar(){
+  const u = norm(document.getElementById("loginUser").value);
+  const p = norm(document.getElementById("loginPass").value);
+  const user = state.users.find(x=>x.username === u && x.password === p);
+  if(!user){ alert("Usuário ou senha inválidos."); return; }
+  state.session = {username:user.username, role:user.role};
+  salvar();
+  atualizarUIPosLogin();
+  esconderLogin();
+}
+function sair(){ state.session = null; salvar(); location.reload(); }
+
+/* ================== TABS / PERMISSÕES (DESKTOP) ================== */
+function setTab(tab){
+  if(!isAdmin()) tab = "estoque";
+
+  const estoque = document.getElementById("tabEstoque");
+  const rel = document.getElementById("tabRelatorios");
+  const usr = document.getElementById("tabUsuarios");
+
+  estoque.style.display = tab === "estoque" ? "block" : "none";
+  rel.style.display = tab === "relatorios" ? "block" : "none";
+  usr.style.display = tab === "usuarios" ? "block" : "none";
+
+  document.getElementById("tabBtnEstoque").classList.toggle("active", tab==="estoque");
+  document.getElementById("tabBtnRelatorios").classList.toggle("active", tab==="relatorios");
+  document.getElementById("tabBtnUsuarios").classList.toggle("active", tab==="usuarios");
+
+  if(tab==="relatorios") renderHistorico();
+  if(tab==="usuarios") renderUsuarios();
+}
+
+function atualizarUIPosLogin(){
+  const chipText = `${currentUser()} • ${currentRole()}`;
+  document.getElementById("chipUser").textContent = chipText;
+  const chipM = document.getElementById("chipUserMobile");
+  if(chipM) chipM.textContent = chipText;
+
+  document.getElementById("drawerAdminNav").style.display = isAdmin() ? "flex" : "none";
+  document.getElementById("drawerAdminSep").style.display = isAdmin() ? "block" : "none";
+
+  if(!isAdmin()){
+    document.getElementById("tabBtnRelatorios").style.display = "none";
+    document.getElementById("tabBtnUsuarios").style.display = "none";
+    setTab("estoque");
+  }else{
+    document.getElementById("tabBtnRelatorios").style.display = "inline-block";
+    document.getElementById("tabBtnUsuarios").style.display = "inline-block";
+  }
+
+  document.getElementById("btnExportCSV").style.display = isAdmin() ? "inline-block" : "none";
+  document.getElementById("btnBackupJSON").style.display = isAdmin() ? "inline-block" : "none";
+  document.getElementById("btnImportJSON").style.display = isAdmin() ? "inline-block" : "none";
+
+  document.getElementById("btnExportCSVMobile").style.display = isAdmin() ? "inline-flex" : "none";
+  document.getElementById("btnBackupJSONMobile").style.display = isAdmin() ? "inline-flex" : "none";
+  document.getElementById("btnImportJSONMobile").style.display = isAdmin() ? "inline-flex" : "none";
+
+  document.getElementById("usuariosAdminArea").style.display = isAdmin() ? "block" : "none";
+
+  atualizarDatalistCategorias();
+  atualizarTudo();
+  aplicarLayoutMobile();
+}
+
+/* ================== MOBILE LAYOUT ================== */
+function aplicarLayoutMobile(){
+  const tabs = document.getElementById("tabsDesktop");
+  const cadastro = document.getElementById("cadastroArea");
+  const pesquisa = document.getElementById("pesquisaArea");
+  const dash = document.getElementById("dashboardPanel");
+  const lista = document.getElementById("lista");
+
+  const tabEstoque = document.getElementById("tabEstoque");
+  const tabRel = document.getElementById("tabRelatorios");
+  const tabUsr = document.getElementById("tabUsuarios");
+
+  if(isMobile()){
+    if(tabs) tabs.style.display = "none";
+
+    const v = state.mobileView || "principal";
+    setMobileTitle(v);
+    highlightDrawer(v);
+
+    tabEstoque.style.display = "none";
+    tabRel.style.display = "none";
+    tabUsr.style.display = "none";
+    if(cadastro) cadastro.style.display = "none";
+    if(pesquisa) pesquisa.style.display = "none";
+    if(lista) lista.style.display = "none";
+    if(dash) dash.style.display = "none";
+
+    if(v === "principal"){
+      tabEstoque.style.display = "block";
+      if(cadastro) cadastro.style.display = "block";
+    }
+    if(v === "itens"){
+      tabEstoque.style.display = "block";
+      if(pesquisa) pesquisa.style.display = "block";
+      if(lista) lista.style.display = "grid";
+      renderProdutos();
+    }
+    if(v === "dashboard"){
+      tabEstoque.style.display = "block";
+      if(dash) dash.style.display = "block";
+    }
+    if(v === "relatorios"){
+      tabRel.style.display = "block";
+      renderHistorico();
+    }
+    if(v === "usuarios"){
+      tabUsr.style.display = "block";
+      renderUsuarios();
+    }
+  }else{
+    if(tabs) tabs.style.display = "flex";
+    document.getElementById("tabBtnEstoque").textContent = "Estoque";
+
+    if(cadastro) cadastro.style.display = "block";
+    if(pesquisa) pesquisa.style.display = "block";
+    if(lista) lista.style.display = "grid";
+    if(dash) dash.style.display = "block";
+
+    if(lista) lista.classList.remove("compact5");
+    setTab("estoque");
+    toggleDrawer(false);
+  }
+}
+window.addEventListener("resize", aplicarLayoutMobile);
+
+/* ================== ITENS COMPACTOS + MODAL ITEM ================== */
+function isMobileItensView(){
+  return isMobile() && (state.mobileView === "itens");
+}
+function abrirItemModal(id){
+  const p = state.produtos.find(x=>x.id===id);
+  if(!p) return;
+
+  document.getElementById("itemModalTitle").textContent = `${p.nome} (${p.id})`;
+
+  const un = unidadeParaExibirProduto(p);
+  const img = p.imagemBase64 || placeholderImg();
+
+  document.getElementById("itemModalBody").innerHTML = `
+    <div class="card" style="box-shadow:none; border:none;">
+      <div class="cardImg" style="height:220px;">
+        <img src="${img}" alt="${escapeHtml(p.nome)}">
+      </div>
+      <div class="cardBody">
+        <h4 class="title" style="font-size:18px;">${escapeHtml(p.nome)}</h4>
+        <div class="meta" style="margin-top:8px;">
+          <span class="badge">${escapeHtml(p.categoria)}</span>
+          <span class="mono">${escapeHtml(p.id)}</span>
+        </div>
+        <div class="meta">
+          <span>Unidade: ${escapeHtml(un)}</span>
+          <span>Cadastro: ${escapeHtml(p.unidade || "un")}</span>
+          <span>Local: ${escapeHtml(p.localizacao || "-")}</span>
+        </div>
+
+        <div class="stock" style="margin-top:12px;">
+          <div>
+            <div class="hint" style="margin-top:0">Estoque</div>
+            <strong>${formatNumber(p.estoque)} ${escapeHtml(un)}</strong>
+          </div>
+        </div>
+
+        <div class="hint" style="margin-top:10px;">Atualizado: ${escapeHtml(p.updatedAt || "-")}</div>
+        
+        <!-- Barcode Section -->
+        <div style="margin-top:16px; border:1px solid var(--border); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h5 style="margin:0; font-size:14px; font-weight:900;">Código de Barras</h5>
+            <button class="ghost" onclick="toggleBarcode()" id="btnToggleBarcode">Ver código de barras</button>
+          </div>
+          <div id="barcodeSection" style="display:none;">
+            <div style="background:#f9fafb; padding:16px; border-radius:6px; margin-bottom:8px; text-align:center;">
+              <div style="font-size:14px; font-weight:bold; margin-bottom:8px; color:#111827;">${escapeHtml(p.barcode)}</div>
+              <div style="transform:scale(1.2); transform-origin:center; margin:16px 0;">${generateCode39Barcode(p.barcode)}</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button onclick="printProductLabel('${p.id}')" class="secondary">🖨️ Imprimir etiqueta</button>
+              <button onclick="toggleBarcode()" class="ghost">Fechar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("itemModalFooter").innerHTML = `
+    <button class="ghost" onclick="entradaEstoque('${p.id}')">+ Entrada</button>
+    <button class="ghost" onclick="saidaDiretaDoModal('${p.id}')">- Saída</button>
+    <button class="secondary" onclick="editarDiretoDoModal('${p.id}')">Editar</button>
+    <button class="danger" onclick="excluirProduto('${p.id}'); fecharItemModal();">Excluir</button>
+  `;
+
+  document.getElementById("itemBackdrop").style.display = "flex";
+}
+function fecharItemModal(){ 
+  document.getElementById("itemBackdrop").style.display = "none"; 
+  // Reset barcode section when closing modal
+  const barcodeSection = document.getElementById('barcodeSection');
+  const toggleBtn = document.getElementById('btnToggleBarcode');
+  if (barcodeSection) barcodeSection.style.display = 'none';
+  if (toggleBtn) toggleBtn.textContent = 'Ver código de barras';
+}
+
+function toggleBarcode() {
+  const section = document.getElementById('barcodeSection');
+  const btn = document.getElementById('btnToggleBarcode');
+  
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    btn.textContent = 'Ocultar código de barras';
+  } else {
+    section.style.display = 'none';
+    btn.textContent = 'Ver código de barras';
+  }
+}
+
+/* ✅ WRAPPERS: fecha a tela do produto e abre a próxima */
+function saidaDiretaDoModal(id){
+  fecharItemModal();
+  setTimeout(()=>saidaEstoque(id), 0);
+}
+function editarDiretoDoModal(id){
+  fecharItemModal();
+  setTimeout(()=>abrirEdit(id), 0);
+}
+
+/* ================== LOCAL / PRATELEIRA ================== */
+function limparFiltroLocal(){
+  document.getElementById("filtroLocal").value = "";
+  renderProdutos();
+}
+function setLocalFiltro(local){
+  document.getElementById("filtroLocal").value = local;
+  renderProdutos();
+}
+function renderPrateleira(){
+  const termo = (document.getElementById("pratBusca").value || "").trim().toLowerCase();
+  const tbody = document.getElementById("tabelaPrateleira");
+  const cont = document.getElementById("pratContador");
+  if(!tbody || !cont) return;
+
+  if(!termo){
+    tbody.innerHTML = "";
+    cont.textContent = "Digite uma prateleira/localização para listar.";
+    return;
+  }
+
+  const itens = state.produtos
+    .filter(p => ((p.localizacao || "").toLowerCase().includes(termo)))
+    .slice()
+    .sort((a,b)=>{
+      const la = (a.localizacao||"").localeCompare(b.localizacao||"");
+      if(la!==0) return la;
+      return (a.nome||"").localeCompare(b.nome||"");
+    });
+
+  tbody.innerHTML = itens.map(p=>`
+    <tr>
+      <td><span class="badge" style="cursor:pointer" onclick="setLocalFiltro('${escapeHtml(p.localizacao || "")}')">${escapeHtml(p.localizacao || "-")}</span></td>
+      <td>
+        <div style="font-weight:900">${escapeHtml(p.nome)}</div>
+        <div class="hint" style="margin:0">${escapeHtml(p.id)}</div>
+      </td>
+      <td class="right mono">${formatNumber(p.estoque)}</td>
+      <td>${escapeHtml(unidadeParaExibirProduto(p))}</td>
+    </tr>
+  `).join("");
+
+  cont.textContent = `Encontrados: ${itens.length} item(ns) para "${document.getElementById("pratBusca").value}"`;
+}
+
+/* ================== CATEGORIAS ================== */
+function atualizarDatalistCategorias(){
+  const dl = document.getElementById("categoriasList");
+  dl.innerHTML = "";
+  [...new Set(state.categorias)].sort((a,b)=>a.localeCompare(b)).forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c;
+    dl.appendChild(opt);
+  });
+
+  const sel = document.getElementById("categoriaExcluir");
+  const cats = [...new Set(state.categorias)]
+    .filter(c => c !== "SEM CATEGORIA")
+    .sort((a,b)=>a.localeCompare(b));
+  sel.innerHTML = cats.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+}
+
+function criarCategoria(){
+  const cat = norm(document.getElementById("novaCategoria").value);
+  if(!cat) return alert("Digite o nome da categoria.");
+  if(!state.categorias.includes(cat)){
+    state.categorias.push(cat);
+    salvar();
+    logEvento({acao:"CRIOU_CATEGORIA", categoria:cat, detalhes:`Criou categoria "${cat}"`});
+    atualizarDatalistCategorias();
+    atualizarTudo();
+  }
+  document.getElementById("novaCategoria").value = "";
+}
+
+function contarProdutosPorCategoria(cat){
+  return state.produtos.filter(p=>p.categoria === cat).length;
+}
+
+function renderCategorias(){
+  const termo = normLower(document.getElementById("pesquisaCat").value);
+  const tbody = document.getElementById("tabelaCategorias");
+
+  const cats = [...new Set(state.categorias)]
+    .filter(c => !termo || c.toLowerCase().includes(termo))
+    .sort((a,b)=>a.localeCompare(b));
+
+  tbody.innerHTML = cats.map(cat => `
+    <tr>
+      <td><span class="badge" style="cursor:pointer" onclick="setFiltroCategoria('${escapeHtml(cat)}')">${escapeHtml(cat)}</span></td>
+      <td class="right">${contarProdutosPorCategoria(cat)}</td>
+    </tr>
+  `).join("");
+}
+
+function setFiltroCategoria(cat){
+  document.getElementById("filtroCategoria").value = cat;
+  renderProdutos();
+}
+
+function excluirCategoria(){
+  const cat = document.getElementById("categoriaExcluir").value;
+  if(!cat) return alert("Nenhuma categoria para excluir.");
+
+  const qtd = contarProdutosPorCategoria(cat);
+  if(!confirm(`Excluir a categoria "${cat}"?\nProdutos nela: ${qtd}\nEles vão para "SEM CATEGORIA".`)) return;
+
+  garantirSemCategoria();
+  state.produtos.forEach(p=>{
+    if(p.categoria === cat){
+      const antes = p.categoria;
+      p.categoria = "SEM CATEGORIA";
+      p.updatedAt = nowISO();
+      logEvento({
+        acao:"EDITOU_PRODUTO",
+        produtoId:p.id,
+        produtoNome:p.nome,
+        categoria:"SEM CATEGORIA",
+        detalhes:`Mudou categoria: "${antes}" → "SEM CATEGORIA" (por exclusão da categoria)`
+      });
+    }
+  });
+
+  state.categorias = state.categorias.filter(c=>c !== cat);
+  salvar();
+  logEvento({acao:"EXCLUIU_CATEGORIA", categoria:cat, detalhes:`Excluiu categoria "${cat}" (moveu produtos para SEM CATEGORIA)`});
+
+  atualizarDatalistCategorias();
+  atualizarTudo();
+}
+
+/* ================== PRODUTOS ================== */
+function limparCampos(){
+  document.getElementById("nome").value = "";
+  document.getElementById("unidade").value = "";
+  document.getElementById("qtdCadastro").value = "";
+  document.getElementById("categoria").value = "";
+  document.getElementById("localizacao").value = "";
+  document.getElementById("imagemFile").value = "";
+}
+
+function limparFiltros(){
+  document.getElementById("busca").value = "";
+  document.getElementById("filtroCategoria").value = "";
+  document.getElementById("filtroLocal").value = "";
+  renderProdutos();
+}
+
+async function cadastrarProduto(){
+  const nome = norm(document.getElementById("nome").value);
+  const unidade = norm(document.getElementById("unidade").value) || "un";
+  const categoria = norm(document.getElementById("categoria").value);
+  const localizacao = norm(document.getElementById("localizacao").value);
+
+  const qtdTxt = norm(document.getElementById("qtdCadastro").value);
+  const qtd = toNumber(qtdTxt);
+
+  if(!nome) return alert("Digite o nome do produto.");
+  if(!categoria) return alert("Digite a categoria.");
+  if(!qtdTxt) return alert("Digite a quantidade do cadastro.");
+  if(!Number.isFinite(qtd) || qtd <= 0) return alert("Quantidade inválida.");
+
+  const v = validarQuantidadePorUnidade(qtd, unidade);
+  if(!v.ok) return alert(v.msg);
+
+  garantirSemCategoria();
+  if(!state.categorias.includes(categoria)) state.categorias.push(categoria);
+
+  const file = document.getElementById("imagemFile").files[0];
+
+  const prod = {
+    id: gerarID(),
+    barcode: "", // Will be set after ID generation
+    nome,
+    unidade,
+    categoria,
+    localizacao,
+    estoque: qtd,
+    imagemBase64: placeholderImg(),
+    createdAt: nowISO(),
+    updatedAt: nowISO()
+  };
+  
+  // Set barcode to be same as ID
+  prod.barcode = prod.id;
+
+  const finalizar = () => {
+    state.produtos.push(prod);
+    salvar();
+    logEvento({
+      acao:"CADASTRO_PRODUTO",
+      produtoId:prod.id,
+      produtoNome:prod.nome,
+      categoria:prod.categoria,
+      qtd: qtd,
+      antes: "",
+      depois: qtd,
+      detalhes:`Cadastrou produto. Local: "${prod.localizacao || "-"}", Unidade: "${prod.unidade}" (exibe: "${unidadeParaExibirProduto(prod)}")`
+    });
+    atualizarDatalistCategorias();
+    atualizarTudo();
+    limparCampos();
+    
+    // Ask if user wants to print label
+    setTimeout(() => {
+      if (confirm(`Produto "${prod.nome}" cadastrado com sucesso!\nDeseja imprimir a etiqueta 65x30mm agora?`)) {
+        printProductLabel(prod.id);
+      }
+    }, 100);
+  };
+
+  if(file){
+    const btn = document.getElementById("btnCadastrar");
+    btn.disabled = true;
+    setLoading("loadingCadastro", true);
+
+    fileToCompressedDataURL(file, { maxW:1280, maxH:1280, quality:0.72 })
+      .then(base64 => {
+        prod.imagemBase64 = base64;
+        finalizar();
+      })
+      .catch(e => {
+        console.error('Image processing error:', e);
+        prod.imagemBase64 = placeholderImg();
+        finalizar();
+      })
+      .finally(() => {
+        setLoading("loadingCadastro", false);
+        btn.disabled = false;
+      });
+  }else{
+    finalizar();
+  }
+}
+
+function entradaEstoque(id){
+  const p = state.produtos.find(x=>x.id===id);
+  if(!p) return;
+
+  const unPrompt = promptLabelUnidade(p);
+  const q = prompt(`Entrada de estoque: ${p.nome}\nQuantidade (${unPrompt}):`);
+  if(q === null) return;
+  const n = toNumber(q);
+
+  const v = validarQuantidadePorUnidade(n, unPrompt);
+  if(!v.ok) return alert(v.msg);
+
+  const antes = p.estoque;
+  p.estoque += n;
+  p.updatedAt = nowISO();
+  salvar();
+
+  logEvento({
+    acao:"ENTRADA",
+    produtoId:p.id, produtoNome:p.nome, categoria:p.categoria,
+    qtd:n, antes:antes, depois:p.estoque,
+    detalhes:`Entrada registrada. Local: "${p.localizacao || "-"}" (Un: ${unPrompt})`
+  });
+
+  atualizarTudo();
+}
+
+/* ================== SAÍDA COM FOTO ================== */
+let pendingSaida = null;
+
+function saidaEstoque(id){
+  const p = state.produtos.find(x=>x.id===id);
+  if(!p) return;
+
+  const unPrompt = promptLabelUnidade(p);
+  const q = prompt(`Saída de estoque: ${p.nome}\nQuantidade (${unPrompt}):`);
+  if(q === null) return;
+  const n = toNumber(q);
+
+  const v = validarQuantidadePorUnidade(n, unPrompt);
+  if(!v.ok) return alert(v.msg);
+
+  if(p.estoque < n) return alert(`Estoque insuficiente. Atual: ${formatNumber(p.estoque)} ${unPrompt}`);
+
+  const pegou = prompt(`Quem pegou? (nome/usuário/obra)`);
+  if(pegou === null) return;
+  if(!norm(pegou)) return alert("Campo 'Quem pegou' é obrigatório.");
+
+  pendingSaida = { produtoId: p.id, qtd: n, quemPegou: norm(pegou), fotoBase64:"" };
+
+  abrirModalFoto();
+}
+
+function abrirModalFoto(){
+  document.getElementById("saidaObs").value = "";
+  document.getElementById("saidaFotoFile").value = "";
+  document.getElementById("btnConfirmarFoto").disabled = true;
+  setLoading("loadingSaida", false);
+  setFotoPreview("");
+  document.getElementById("fotoBackdrop").style.display = "flex";
+}
+function fecharModalFoto(){ document.getElementById("fotoBackdrop").style.display = "none"; }
+
+function cancelarFoto(){
+  pendingSaida = null;
+  fecharModalFoto();
+}
+
+function setFotoPreview(base64){
+  const box = document.getElementById("fotoPreview");
+  if(!base64){
+    box.innerHTML = `<span class="hint" style="margin:0">Sem foto</span>`;
+    return;
+  }
+  box.innerHTML = `<img src="${base64}" alt="Foto da saída">`;
+}
+
+function limparFoto(){
+  document.getElementById("saidaFotoFile").value = "";
+  document.getElementById("btnConfirmarFoto").disabled = true;
+  setLoading("loadingSaida", false);
+  if(pendingSaida) pendingSaida.fotoBase64 = "";
+  setFotoPreview("");
+}
+
+document.getElementById("saidaFotoFile").addEventListener("change", async (ev)=>{
+  const file = ev.target.files && ev.target.files[0];
+  if(!file){
+    document.getElementById("btnConfirmarFoto").disabled = true;
+    if(pendingSaida) pendingSaida.fotoBase64 = "";
+    setFotoPreview("");
+    return;
+  }
+
+  document.getElementById("btnConfirmarFoto").disabled = true;
+  setLoading("loadingSaida", true);
+
+  try{
+    let base64 = "";
+    if(isMobile()){
+      base64 = await fileToCompressedDataURL(file, { maxW:900, maxH:900, quality:0.70 });
+    }else{
+      const reader = new FileReader();
+      base64 = await new Promise((resolve,reject)=>{
+        reader.onload = (e)=>resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    if(!pendingSaida) pendingSaida = {};
+    pendingSaida.fotoBase64 = base64;
+    setFotoPreview(base64);
+    document.getElementById("btnConfirmarFoto").disabled = false;
+  }catch(e){
+    alert("Não deu para processar a foto. Tente outra.");
+    if(pendingSaida) pendingSaida.fotoBase64 = "";
+    setFotoPreview("");
+    document.getElementById("btnConfirmarFoto").disabled = true;
+  }finally{
+    setLoading("loadingSaida", false);
+  }
+});
+
+function confirmarSaidaComFoto(){
+  if(!pendingSaida) return alert("Operação inválida.");
+  if(!pendingSaida.fotoBase64) return alert("Foto obrigatória. Tire/seleciona uma foto.");
+
+  const p = state.produtos.find(x=>x.id===pendingSaida.produtoId);
+  if(!p) { pendingSaida = null; fecharModalFoto(); return alert("Produto não encontrado."); }
+
+  const obs = norm(document.getElementById("saidaObs").value || "");
+
+  const antes = p.estoque;
+  p.estoque -= pendingSaida.qtd;
+  p.updatedAt = nowISO();
+  salvar();
+
+  logEvento({
+    acao:"SAÍDA",
+    produtoId:p.id,
+    produtoNome:p.nome,
+    categoria:p.categoria,
+    qtd: pendingSaida.qtd,
+    antes: antes,
+    depois: p.estoque,
+    quemPegou: pendingSaida.quemPegou,
+    detalhes: obs,
+    fotoBase64: pendingSaida.fotoBase64
+  });
+
+  pendingSaida = null;
+  fecharModalFoto();
+  atualizarTudo();
+}
+
+/* ====== EDITAR / EXCLUIR ====== */
+function excluirProduto(id){
+  const p = state.produtos.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm(`Excluir produto ${p.id} - ${p.nome}?`)) return;
+
+  state.produtos = state.produtos.filter(x=>x.id!==id);
+  salvar();
+
+  logEvento({
+    acao:"EXCLUIU_PRODUTO",
+    produtoId:p.id, produtoNome:p.nome, categoria:p.categoria,
+    qtd:"", antes:p.estoque, depois:"",
+    detalhes:`Excluiu produto. Local: "${p.localizacao || "-"}"`
+  });
+
+  atualizarTudo();
+}
+
+function abrirEdit(id){
+  const p = state.produtos.find(x=>x.id===id);
+  if(!p) return;
+
+  document.getElementById("editId").value = p.id;
+  document.getElementById("editIdLabel").textContent = p.id;
+  document.getElementById("editNome").value = p.nome;
+  document.getElementById("editUnidade").value = p.unidade;
+  document.getElementById("editCategoria").value = p.categoria;
+  document.getElementById("editLocalizacao").value = p.localizacao;
+  document.getElementById("editImagemFile").value = "";
+  document.getElementById("editMotivo").value = "";
+  setLoading("loadingEdit", false);
+
+  document.getElementById("editBackdrop").style.display = "flex";
+}
+function fecharEdit(){ document.getElementById("editBackdrop").style.display = "none"; }
+
+async function salvarEdicao(){
+  const id = document.getElementById("editId").value;
+  const p = state.produtos.find(x=>x.id===id);
+  if(!p) return;
+
+  const nome = norm(document.getElementById("editNome").value);
+  const unidade = norm(document.getElementById("editUnidade").value) || "un";
+  const categoria = norm(document.getElementById("editCategoria").value);
+  const localizacao = norm(document.getElementById("editLocalizacao").value);
+  const motivo = norm(document.getElementById("editMotivo").value);
+
+  if(!nome) return alert("Nome obrigatório.");
+  if(!categoria) return alert("Categoria obrigatória.");
+
+  garantirSemCategoria();
+  if(!state.categorias.includes(categoria)) state.categorias.push(categoria);
+
+  const antes = {...p};
+
+  const file = document.getElementById("editImagemFile").files[0];
+  if(file){
+    setLoading("loadingEdit", true);
+    try{
+      if(isMobile()){
+        p.imagemBase64 = await fileToCompressedDataURL(file, { maxW:1280, maxH:1280, quality:0.72 });
+      }else{
+        const reader = new FileReader();
+        p.imagemBase64 = await new Promise((resolve,reject)=>{
+          reader.onload = (e)=>resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+    }catch(e){
+      alert("Falha ao processar a imagem.");
+    }finally{
+      setLoading("loadingEdit", false);
+    }
+  }
+
+  p.nome = nome;
+  p.unidade = unidade;
+  p.categoria = categoria;
+  p.localizacao = localizacao;
+  p.updatedAt = nowISO();
+  salvar();
+
+  const mud = [];
+  if(antes.nome !== p.nome) mud.push(`nome: "${antes.nome}"→"${p.nome}"`);
+  if(antes.unidade !== p.unidade) mud.push(`unidade: "${antes.unidade}"→"${p.unidade}"`);
+  if(antes.categoria !== p.categoria) mud.push(`categoria: "${antes.categoria}"→"${p.categoria}"`);
+  if(antes.localizacao !== p.localizacao) mud.push(`local: "${antes.localizacao}"→"${p.localizacao}"`);
+  if(antes.imagemBase64 !== p.imagemBase64) mud.push(`imagem: alterada`);
+
+  logEvento({
+    acao:"EDITOU_PRODUTO",
+    produtoId:p.id, produtoNome:p.nome, categoria:p.categoria,
+    qtd:"", antes:antes.estoque, depois:p.estoque,
+    detalhes: (mud.length ? mud.join(" | ") : "Sem mudanças") + (motivo ? ` | Motivo: ${motivo}` : "")
+  });
+
+  atualizarDatalistCategorias();
+  atualizarTudo();
+  fecharEdit();
+}
+
+/* ================== KPIs / ATUALIZAÇÃO GLOBAL ================== */
+function calcularKPIs(){
+  const elP = document.getElementById("kpiProdutos");
+  const elC = document.getElementById("kpiCategorias");
+  const elI = document.getElementById("kpiItens");
+  if(!elP || !elC || !elI) return;
+
+  elP.textContent = state.produtos.length;
+  elC.textContent = new Set(state.categorias).size;
+
+  const totalItens = state.produtos.reduce((a,p)=>a + (Number(p.estoque)||0), 0);
+  elI.textContent = formatNumber(totalItens);
+}
+
+function atualizarTudo(){
+  calcularKPIs();
+  renderCategorias();
+  renderProdutos();
+  renderPrateleira();
+  if(isAdmin()) renderHistorico();
+  if(isAdmin()) renderUsuarios();
+}
+
+/* ================== RENDER PRODUTOS ================== */
+function renderProdutos(){
+  const termo = normLower(document.getElementById("busca").value);
+  const filtroCat = normLower(document.getElementById("filtroCategoria").value);
+  const filtroLocal = normLower(document.getElementById("filtroLocal").value);
+
+  let lista = state.produtos.slice();
+
+  if(filtroLocal){
+    lista = lista.filter(p => (p.localizacao || "").toLowerCase().includes(filtroLocal));
+  }
+  if(filtroCat){
+    lista = lista.filter(p => (p.categoria||"").toLowerCase().includes(filtroCat));
+  }
+  if(termo){
+    lista = lista.filter(p=>{
+      const s = `${p.id} ${p.nome} ${p.categoria} ${p.localizacao}`.toLowerCase();
+      return s.includes(termo);
+    });
+  }
+
+  lista.sort((a,b)=>{
+    const c = (a.categoria||"").localeCompare(b.categoria||"");
+    if(c!==0) return c;
+    return (a.nome||"").localeCompare(b.nome||"");
+  });
+
+  document.getElementById("contador").textContent = `Mostrando ${lista.length} de ${state.produtos.length} produto(s).`;
+
+  const grid = document.getElementById("lista");
+  if(grid){
+    grid.classList.toggle("compact5", isMobileItensView());
+  }
+
+  document.getElementById("lista").innerHTML = lista.map(p=>`
+    <div class="card" onclick="abrirItemModal('${p.id}')">
+      <div class="cardImg"><img src="${p.imagemBase64 || placeholderImg()}" alt="${escapeHtml(p.nome)}"></div>
+      <div class="cardBody">
+        <h4 class="title">${escapeHtml(p.nome)}</h4>
+        <div class="meta">
+          <span class="badge">${escapeHtml(p.categoria)}</span>
+          <span class="mono">${escapeHtml(p.id)}</span>
+        </div>
+        <div class="meta">
+          <span>Unidade: ${escapeHtml(unidadeParaExibirProduto(p))}</span>
+          <span>Cadastro: ${escapeHtml(p.unidade || "un")}</span>
+          <span>Local: ${escapeHtml(p.localizacao || "-")}</span>
+        </div>
+
+        <div class="stock">
+          <div>
+            <div class="hint" style="margin-top:0">Estoque</div>
+            <strong>${formatNumber(p.estoque)} ${escapeHtml(unidadeParaExibirProduto(p))}</strong>
+          </div>
+          <div class="row" style="gap:8px">
+            <button class="ghost" onclick="event.stopPropagation(); entradaEstoque('${p.id}')">+ Entrada</button>
+            <button class="ghost" onclick="event.stopPropagation(); saidaEstoque('${p.id}')">- Saída</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="ghost" onclick="event.stopPropagation(); printProductLabel('${p.id}')">🏷️ Etiqueta</button>
+          <button class="secondary" onclick="event.stopPropagation(); abrirEdit('${p.id}')">Editar</button>
+          <button class="danger" onclick="event.stopPropagation(); excluirProduto('${p.id}')">Excluir</button>
+        </div>
+
+        <div class="hint">Atualizado: ${escapeHtml(p.updatedAt || "-")}</div>
+      </div>
+    </div>
+  `).join("");
+
+  calcularKPIs();
+}
+
+/* ================== RELATÓRIOS ================== */
+function limparFiltrosRel(){
+  document.getElementById("relBusca").value = "";
+  document.getElementById("relAcao").value = "";
+  renderHistorico();
+}
+
+function getHistoricoFiltrado(){
+  const termo = normLower(document.getElementById("relBusca").value || "");
+  const acao = norm(document.getElementById("relAcao").value || "");
+
+  let linhas = state.historico.slice();
+  if(acao) linhas = linhas.filter(x => x.acao === acao);
+  if(termo){
+    linhas = linhas.filter(x=>{
+      const s = `${x.data} ${x.usuario} ${x.role} ${x.acao} ${x.produtoId} ${x.produtoNome} ${x.categoria} ${x.quemPegou} ${x.detalhes}`.toLowerCase();
+      return s.includes(termo);
+    });
+  }
+  return linhas;
+}
+
+function renderHistorico(){
+  const tbody = document.getElementById("tabelaHistorico");
+  const cont = document.getElementById("relContador");
+  if(!tbody || !cont) return;
+
+  const linhas = getHistoricoFiltrado();
+
+  tbody.innerHTML = linhas.map((x, idx)=>`
+    <tr>
+      <td class="mono">${escapeHtml(x.data)}</td>
+      <td>${escapeHtml(x.usuario)} <span class="hint" style="margin:0">(${escapeHtml(x.role)})</span></td>
+      <td><span class="badge">${escapeHtml(x.acao)}</span></td>
+      <td>
+        <div class="mono">${escapeHtml(x.produtoId || "")}</div>
+        <div>${escapeHtml(x.produtoNome || "")}</div>
+        <div class="hint" style="margin-top:4px;">${escapeHtml(x.categoria || "")}</div>
+      </td>
+      <td class="right mono">${escapeHtml(x.qtd === "" ? "" : formatNumber(x.qtd))}</td>
+      <td class="right mono">${escapeHtml(x.antes === "" ? "" : formatNumber(x.antes))}</td>
+      <td class="right mono">${escapeHtml(x.depois === "" ? "" : formatNumber(x.depois))}</td>
+      <td>${escapeHtml(x.quemPegou || "")}</td>
+      <td>
+        ${escapeHtml(x.detalhes || "")}
+        ${x.fotoBase64 ? `<div style="margin-top:6px;"><span class="linkBtn" onclick="verFotoHistorico(${idx})">📷 Ver foto</span></div>` : ""}
+      </td>
+    </tr>
+  `).join("");
+
+  cont.textContent = `Registros: ${linhas.length} (total: ${state.historico.length})`;
+}
+
+function verFotoHistorico(idx){
+  const linhas = getHistoricoFiltrado();
+  const x = linhas[idx];
+  if(!x || !x.fotoBase64) return alert("Sem foto neste registro.");
+
+  const box = document.getElementById("viewFotoBox");
+  box.innerHTML = `<img src="${x.fotoBase64}" alt="Foto da saída" style="width:100%;height:100%;object-fit:contain;background:#111827;">`;
+  document.getElementById("viewFotoMeta").textContent = `${x.data} • ${x.usuario} • ${x.acao} • ${x.produtoNome} • Quem pegou: ${x.quemPegou}`;
+  document.getElementById("viewFotoBackdrop").style.display = "flex";
+}
+function fecharViewFoto(){ document.getElementById("viewFotoBackdrop").style.display = "none"; }
+
+function limparHistorico(){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+  if(!confirm("Limpar TODO o histórico? Isso não dá para desfazer.")) return;
+  state.historico = [];
+  salvar();
+  renderHistorico();
+}
+
+function exportarCSVHistorico(){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+
+  const header = ["data","usuario","role","acao","produtoId","produtoNome","categoria","qtd","antes","depois","quemPegou","detalhes","temFoto"];
+  const rows = [header.join(",")];
+
+  const esc = (v)=>{
+    const s = String(v ?? "");
+    if(s.includes('"') || s.includes(",") || s.includes("\n")) return `"${s.replaceAll('"','""')}"`;
+    return s;
+  };
+
+  state.historico.forEach(x=>{
+    rows.push([
+      x.data, x.usuario, x.role, x.acao, x.produtoId, x.produtoNome, x.categoria,
+      x.qtd, x.antes, x.depois, x.quemPegou, x.detalhes, x.fotoBase64 ? "SIM" : "NÃO"
+    ].map(esc).join(","));
+  });
+
+  const blob = new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "relatorio_historico.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* ================== USUÁRIOS ================== */
+function contarAdmins(){ return state.users.filter(u=>u.role==="ADMIN").length; }
+
+function renderUsuarios(){
+  const tbody = document.getElementById("tabelaUsuarios");
+  if(!tbody) return;
+
+  const users = state.users.slice().sort((a,b)=>a.username.localeCompare(b.username));
+  tbody.innerHTML = users.map(u=>{
+    const ehUltimoAdmin = (u.role==="ADMIN" && contarAdmins()===1);
+    const podeApagar = isAdmin() && !ehUltimoAdmin && (u.username !== currentUser());
+    return `
+      <tr>
+        <td class="mono">${escapeHtml(u.username)}</td>
+        <td>${escapeHtml(u.role)}</td>
+        <td class="right">
+          <button class="ghost" onclick="resetSenhaUsuario('${escapeHtml(u.username)}')" ${isAdmin() ? "" : "disabled"}>Trocar senha</button>
+          <button class="danger" onclick="removerUsuario('${escapeHtml(u.username)}')" ${podeApagar ? "" : "disabled"}>Remover</button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function criarUsuario(){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+
+  const username = norm(document.getElementById("novoUserNome").value);
+  const password = norm(document.getElementById("novoUserSenha").value);
+  const role = norm(document.getElementById("novoUserRole").value) || "OPERADOR";
+
+  if(username.length < 2) return alert("Usuário muito curto.");
+  if(password.length < 4) return alert("Senha deve ter pelo menos 4 caracteres.");
+  if(state.users.find(x=>x.username.toLowerCase()===username.toLowerCase())) return alert("Usuário já existe.");
+
+  state.users.push({username, password, role});
+  salvar();
+  logEvento({acao:"CRIOU_USUARIO", detalhes:`Criou usuário ${username} (${role})`});
+
+  document.getElementById("novoUserNome").value = "";
+  document.getElementById("novoUserSenha").value = "";
+  document.getElementById("novoUserRole").value = "OPERADOR";
+
+  renderUsuarios();
+}
+
+function removerUsuario(username){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+
+  const u = state.users.find(x=>x.username===username);
+  if(!u) return;
+
+  if(u.role==="ADMIN" && contarAdmins()===1) return alert("Não pode remover o último ADMIN.");
+  if(u.username === currentUser()) return alert("Você não pode remover você mesmo.");
+  if(!confirm(`Remover usuário "${username}"?`)) return;
+
+  state.users = state.users.filter(x=>x.username!==username);
+  salvar();
+  logEvento({acao:"REMOVEU_USUARIO", detalhes:`Removeu usuário ${username}`});
+  renderUsuarios();
+}
+
+function resetSenhaUsuario(username){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+
+  const u = state.users.find(x=>x.username===username);
+  if(!u) return;
+
+  const nova = prompt(`Nova senha para ${username} (mínimo 4):`);
+  if(nova === null) return;
+  if(norm(nova).length < 4) return alert("Senha muito curta.");
+
+  u.password = norm(nova);
+  salvar();
+  logEvento({acao:"TROCOU_SENHA", detalhes:`Trocou senha do usuário ${username}`});
+  alert("Senha atualizada.");
+}
+
+/* ================== IMPORT/EXPORT JSON ================== */
+function exportarJSON(){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "almoxarifado_backup.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importarJSON(){
+  if(!isAdmin()) return alert("Somente ADMIN pode fazer isso.");
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = () => {
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try{
+        const obj = JSON.parse(e.target.result);
+        if(!obj || typeof obj !== "object") throw new Error("Inválido");
+        if(!Array.isArray(obj.produtos) || !Array.isArray(obj.categorias) || !Array.isArray(obj.historico) || !Array.isArray(obj.users)) {
+          throw new Error("Estrutura inválida");
+        }
+        state = obj;
+        state.lastId = state.lastId || 0;
+        state.session = state.session || null;
+        state.mobileView = state.mobileView || "principal";
+        garantirSemCategoria();
+        salvar();
+        alert("Backup importado.");
+        location.reload();
+      }catch(err){
+        alert("Arquivo inválido.");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+/* ================== EVENTS ================== */
+document.getElementById("busca").addEventListener("input", renderProdutos);
+document.getElementById("filtroCategoria").addEventListener("input", renderProdutos);
+document.getElementById("filtroLocal").addEventListener("input", renderProdutos);
+
+document.getElementById("pesquisaCat").addEventListener("input", renderCategorias);
+document.getElementById("pratBusca").addEventListener("input", renderPrateleira);
+
+document.getElementById("relBusca").addEventListener("input", renderHistorico);
+document.getElementById("relAcao").addEventListener("change", renderHistorico);
+
+// Scanner input event
+document.getElementById("scannerInput").addEventListener("keypress", (e) => {
+  if (e.key === 'Enter') {
+    const codigo = e.target.value.trim();
+    if (codigo) {
+      buscarPorCodigoDeBarras(codigo);
+    }
+  }
+});
+
+// Initialize barcode detector
+initBarcodeDetector();
+
+/* ================== INIT ================== */
+carregar();
+garantirSemCategoria();
+
+if((state.users || []).length === 0){
+  state.session = null;
+  salvar();
+  mostrarLogin();
+}else{
+  if(state.session){
+    atualizarUIPosLogin();
+    esconderLogin();
+  }else{
+    mostrarLogin();
+  }
+}
+
+atualizarDatalistCategorias();
+atualizarTudo();
+aplicarLayoutMobile();
+highlightDrawer(state.mobileView);
+</script>
+<script type="module">
+    // Importação dos módulos necessários
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // ⚠️ SUBSTITUA OS DADOS ABAIXO PELOS QUE APARECERAM NO SEU FIREBASE (Passo 1 que fizemos)
+    const firebaseConfig = {
+        apiKey: "SUA_API_KEY_AQUI",
+        authDomain: "almoxarifadojmb.firebaseapp.com",
+        projectId: "almoxarifadojmb",
+        storageBucket: "almoxarifadojmb.appspot.com",
+        messagingSenderId: "SEU_SENDER_ID",
+        appId: "SEU_APP_ID"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const estoqueRef = collection(db, "movimentacoes");
+
+    // Função para Salvar Movimentação (Entrada ou Saída)
+    async function registrarMovimentacao(tipo) {
+        const produto = document.getElementById('produto').value;
+        const quantidade = document.getElementById('quantidade').value;
+
+        if (!produto || !quantidade) {
+            alert("Por favor, preencha o produto e a quantidade.");
+            return;
+        }
+
+        try {
+            await addDoc(estoqueRef, {
+                nome: produto,
+                qtd: parseInt(quantidade),
+                tipo: tipo, // "Entrada" ou "Saída"
+                data: new Date(),
+                horario: new Date().toLocaleTimeString()
+            });
+            
+            // Limpa os campos após enviar
+            document.getElementById('produto').value = '';
+            document.getElementById('quantidade').value = '';
+            alert(`${tipo} registrada com sucesso!`);
+        } catch (e) {
+            console.error("Erro ao salvar: ", e);
+        }
+    }
+
+    // Vincula as funções aos seus botões existentes
+    document.querySelector('.btn-entrada').addEventListener('click', () => registrarMovimentacao('Entrada'));
+    document.querySelector('.btn-saida').addEventListener('click', () => registrarMovimentacao('Saída'));
+
+    // Lógica para Listar os itens em tempo real na sua tabela
+    const q = query(estoqueRef, orderBy("data", "desc"));
+    onSnapshot(q, (snapshot) => {
+        const tabelaCorpo = document.querySelector('tbody');
+        tabelaCorpo.innerHTML = ''; // Limpa a tabela para atualizar
+
+        snapshot.forEach((doc) => {
+            const item = doc.data();
+            const novaLinha = document.createElement('tr');
+            
+            // Define a cor baseada no tipo para facilitar a leitura
+            const corTipo = item.tipo === 'Entrada' ? 'color: green;' : 'color: red;';
+
+            novaLinha.innerHTML = `
+                <td>${item.nome}</td>
+                <td>${item.qtd}</td>
+                <td style="${corTipo} font-weight: bold;">${item.tipo}</td>
+                <td>${item.horario}</td>
+            `;
+            tabelaCorpo.appendChild(novaLinha);
+        });
+    });
+</script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEFQt2fRWtlHKuupEAIwN8iZX3g6FdAEs",
+    authDomain: "almoxarifadojmb-c6fce.firebaseapp.com",
+    projectId: "almoxarifadojmb-c6fce",
+    storageBucket: "almoxarifadojmb-c6fce.firebasestorage.app",
+    messagingSenderId: "999411802600",
+    appId: "1:999411802600:web:abbc0e2fbd91e381b0845d",
+    measurementId: "G-MNVX86E3EX"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+</body>
+</html>
+
